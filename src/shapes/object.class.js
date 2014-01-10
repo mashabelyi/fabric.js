@@ -9,6 +9,36 @@
       degreesToRadians = fabric.util.degreesToRadians,
       supportsLineDash = fabric.StaticCanvas.supports('setLineDash');
 
+  var attributesMap = {
+    'fill-opacity':     'fillOpacity',
+    'fill-rule':        'fillRule',
+    'font-family':      'fontFamily',
+    'font-size':        'fontSize',
+    'font-style':       'fontStyle',
+    'font-weight':      'fontWeight',
+    'cx':               'left',
+    'x':                'left',
+    'r':                'radius',
+    'stroke-dasharray': 'strokeDashArray',
+    'stroke-linecap':   'strokeLineCap',
+    'stroke-linejoin':  'strokeLineJoin',
+    'stroke-miterlimit':'strokeMiterLimit',
+    'stroke-opacity':   'strokeOpacity',
+    'stroke-width':     'strokeWidth',
+    'text-decoration':  'textDecoration',
+    'cy':               'top',
+    'y':                'top',
+    'transform':        'transformMatrix'
+  };
+
+  function normalizeAttr(attr) {
+    // transform attribute names
+    if (attr in attributesMap) {
+      return attributesMap[attr];
+    }
+    return attr;
+  }
+
   if (fabric.Object) {
     return;
   }
@@ -719,7 +749,7 @@
      */
     setOptions: function(options) {
       for (var prop in options) {
-        this.set(prop, options[prop]);
+        this.set(normalizeAttr(prop), options[prop]);
       }
       this._initGradient(options);
       this._initPattern(options);
@@ -829,7 +859,7 @@
      * @return {Any} value of a property
      */
     get: function(property) {
-      return this[property];
+      return this[normalizeAttr(property)];
     },
 
     /**
@@ -842,7 +872,7 @@
     set: function(key, value) {
       if (typeof key === 'object') {
         for (var prop in key) {
-          this._set(prop, key[prop]);
+          this._set(normalizeAttr(prop), key[prop]);
         }
       }
       else {
