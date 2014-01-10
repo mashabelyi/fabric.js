@@ -404,7 +404,7 @@
     flipY:                    false,
 
     /**
-     * Opacity of an object
+     * Opacity of an object (affects fillOpacity and strokeOpacity)
      * @type Number
      * @default
      */
@@ -485,7 +485,13 @@
      * @default
      */
     fill:                     'rgb(0,0,0)',
-
+    /**
+      * Opacity of an object's fill
+      * @type Number
+      * @default
+      */
+    
+    fillOpacity:              1,
     /**
      * Fill rule used to fill an object
      * @type String
@@ -506,6 +512,13 @@
      * @default
      */
     stroke:                   null,
+
+    /**
+     * Opacity of an object's stroke
+     * @type Number
+     * @default
+     */
+    strokeOpacity:            1,
 
     /**
      * Width of a stroke used to render this object
@@ -791,7 +804,9 @@
         width:              toFixed(this.width, NUM_FRACTION_DIGITS),
         height:             toFixed(this.height, NUM_FRACTION_DIGITS),
         fill:               (this.fill && this.fill.toObject) ? this.fill.toObject() : this.fill,
+        fillOpacity:        toFixed(this.fillOpacity, NUM_FRACTION_DIGITS),
         stroke:             (this.stroke && this.stroke.toObject) ? this.stroke.toObject() : this.stroke,
+        strokeOpacity:      toFixed(this.strokeOpacity, NUM_FRACTION_DIGITS),
         strokeWidth:        toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
         strokeDashArray:    this.strokeDashArray,
         strokeLineCap:      this.strokeLineCap,
@@ -1038,6 +1053,9 @@
     _renderFill: function(ctx) {
       if (!this.fill) return;
 
+      ctx.save();
+      ctx.globalAlpha = ctx.globalAlpha * this.fillOpacity;
+
       if (this.fill.toLive) {
         ctx.save();
         ctx.translate(
@@ -1051,6 +1069,7 @@
       if (this.shadow && !this.shadow.affectStroke) {
         this._removeShadow(ctx);
       }
+      ctx.restore();
     },
 
     /**
@@ -1061,6 +1080,7 @@
       if (!this.stroke) return;
 
       ctx.save();
+      ctx.globalAlpha = ctx.globalAlpha * this.strokeOpacity;
       if (this.strokeDashArray) {
         // Spec requires the concatenation of two copies the dash list when the number of elements is odd
         if (1 & this.strokeDashArray.length) {
