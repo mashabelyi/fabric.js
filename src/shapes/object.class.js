@@ -927,6 +927,9 @@
       else if (key === 'shadow' && value && !(value instanceof fabric.Shadow)) {
         value = new fabric.Shadow(value);
       }
+      else if(key == 'transformMatrix'){
+        value = new Matrix(value[0], value[1], value[2], value[3], value[4], value[5]);
+      }
 
       this[key] = value;
 
@@ -994,12 +997,45 @@
 
     _transform: function(ctx, noTransform) {
       var m = this.transformMatrix;
+      // console.log(m);
       if (m && !this.group) {
-        ctx.setTransform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        // ctx.setTransform(m[0], m[1], m[2], m[3], m[4], m[5]);
+
+        // var m = new Matrix(m[0], m[1], m[2], m[3], m[4], m[5]);
+        // this.transformValues = m.split();
+        var transformValues = m.split();
+
+        if(!this.initState){
+            this.initState = {
+                left: this.originalState.left,
+                top: this.originalState.top,
+                scaleX: this.originalState.scaleX,
+                scaleY: this.originalState.scaleY,
+                angle: this.originalState.angle
+            }
+        }
+        if(!this.canvas._currentTransform){
+
+            this.left  = this.initState.left + transformValues.dx;
+            this.top  = this.initState.top + transformValues.dy;
+            // console.log('left: '+ this.left+', '+this.top);
+            this.scaleX  = this.initState.scaleX * transformValues.scalex;
+            this.scaleY  = this.initState.scaleY * transformValues.scaley;
+            this.angle  = this.initState.angle + transformValues.rotate;
+
+            // this.left  = this.left + transformValues.dx;
+            // this.top  = this.top + transformValues.dy;
+            // console.log('left: '+ this.left+', '+this.top);
+            // this.scaleX  = this.scaleX * transformValues.scalex;
+            // this.scaleY  = this.scaleY * transformValues.scaley;
+            // this.angle  = this.angle + transformValues.rotate;
+        }
+        this.setCoords();
       }
       if (!noTransform) {
         this.transform(ctx);
       }
+
     },
 
     _setStrokeStyles: function(ctx) {

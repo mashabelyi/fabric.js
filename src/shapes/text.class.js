@@ -464,7 +464,7 @@
     _renderViaNative: function(ctx) {
       var textLines = this.text.split(this._reNewline);
 
-      this.transform(ctx, fabric.isLikelyNode);
+      // this.transform(ctx, fabric.isLikelyNode);
 
       this._setTextStyles(ctx);
 
@@ -863,7 +863,8 @@
       ctx.save();
       var m = this.transformMatrix;
       if (m && !this.group) {
-        ctx.setTransform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        // ctx.setTransform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        this._transform(ctx, noTransform);
       }
       this._render(ctx);
       if (!noTransform && this.active) {

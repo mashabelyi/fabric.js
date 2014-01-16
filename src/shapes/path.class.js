@@ -446,10 +446,11 @@
       ctx.save();
       var m = this.transformMatrix;
       if (m) {
-        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        // ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        this._transform(ctx, noTransform);
       }
       if (!noTransform) {
-        this.transform(ctx);
+        // this.transform(ctx);
       }
       this._setStrokeStyles(ctx);
       this._setFillStyles(ctx);

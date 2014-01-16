@@ -239,8 +239,16 @@
 
       if (target) {
         target.isMoving = false;
+      
+        // update transform matrix
+        var m = target.transformMatrix;
+        if(m){
+          var transformValues = m.split();
+          target.transformMatrix.translate(target.left-target.initState.left-transformValues.dx, target.top-target.initState.top-transformValues.dy, true);
+          target.transformMatrix.scale(target.scaleX/(target.initState.scaleX*transformValues.scalex), target.scaleY/(target.initState.scaleY*transformValues.scaley));
+          target.transformMatrix.rotate(target.angle-target.initState.angle-transformValues.rotate);
+        }
       }
-
       shouldRender && this.renderAll();
 
       this._handleCursorAndEvent(e, target);
@@ -388,6 +396,7 @@
         this._beforeTransform(e, target);
         this._setupCurrentTransform(e, target);
       }
+
       // we must renderAll so that active image is placed on the top canvas
       shouldRender && this.renderAll();
 
