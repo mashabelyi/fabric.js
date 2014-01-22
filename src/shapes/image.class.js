@@ -130,11 +130,11 @@
         ctx.translate(-this.group.width/2 + this.width/2, -this.group.height/2 + this.height/2);
       }
       if (m) {
-        // ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
-        this._transform(ctx, noTransform);
+        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        // this._transform(ctx, noTransform);
       }
       if (!noTransform) {
-        // this.transform(ctx);
+        this.transform(ctx);
       }
 
       ctx.save();

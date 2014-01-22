@@ -45,12 +45,29 @@
       addListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
       addListener(this.upperCanvasEl, 'touchmove', this._onMouseMove);
 
+      // init dblcklick listener
+      this.initDoubleClickSimulation();
+
       if (typeof Event !== 'undefined' && 'add' in Event) {
         Event.add(this.upperCanvasEl, 'gesture', this._onGesture);
         Event.add(this.upperCanvasEl, 'drag', this._onDrag);
         Event.add(this.upperCanvasEl, 'orientation', this._onOrientationChange);
         Event.add(this.upperCanvasEl, 'shake', this._onShake);
       }
+    },
+
+    /**
+     * Initializes "dbclick" event handler
+     */
+    initDoubleClickSimulation: function() {
+
+      // for double click
+      this.__lastClickTime = +new Date();
+
+      // for triple click
+      this.__lastLastClickTime = +new Date();
+
+      this.lastPointer = { };
     },
 
     /**
@@ -240,14 +257,14 @@
       if (target) {
         target.isMoving = false;
       
-        // update transform matrix
-        var m = target.transformMatrix;
-        if(m){
-          var transformValues = m.split();
-          target.transformMatrix.translate(target.left-target.initState.left-transformValues.dx, target.top-target.initState.top-transformValues.dy, true);
-          target.transformMatrix.scale(target.scaleX/(target.initState.scaleX*transformValues.scalex), target.scaleY/(target.initState.scaleY*transformValues.scaley));
-          target.transformMatrix.rotate(target.angle-target.initState.angle-transformValues.rotate);
-        }
+        // // update transform matrix
+        // var m = target.transformMatrix;
+        // if(m){
+        //   var transformValues = m.split();
+        //   target.transformMatrix.translate(target.left-target.initState.left-transformValues.dx, target.top-target.initState.top-transformValues.dy, true);
+        //   target.transformMatrix.scale(target.scaleX/(target.initState.scaleX*transformValues.scalex), target.scaleY/(target.initState.scaleY*transformValues.scaley));
+        //   target.transformMatrix.rotate(target.angle-target.initState.angle-transformValues.rotate);
+        // }
       }
       shouldRender && this.renderAll();
 
@@ -363,6 +380,10 @@
      */
     __onMouseDown: function (e) {
 
+      // from itext dblclick
+      this.__newClickTime = +new Date();
+      var newPointer = this.getPointer(e);
+
       // accept only left clicks
       var isLeftClick  = 'which' in e ? e.which === 1 : e.button === 1;
       if (!isLeftClick && !fabric.isTouchSupported) return;
@@ -392,10 +413,33 @@
         target = this.getActiveGroup();
       }
 
-      if (target && target.selectable && !shouldGroup) {
+      if(target && target.active && this.isDoubleClick(newPointer)){
+        target.fire('dblclickObj', { e: e });
+      }
+
+      if(target && target.active){
         this._beforeTransform(e, target);
         this._setupCurrentTransform(e, target);
+
+
       }
+      else if (target && target.selectable && !shouldGroup && this.isDoubleClick(newPointer) && !this._activeObject && !this._activeGroup) {
+        // this._beforeTransform(e, target);
+        // this._setupCurrentTransform(e, target);
+        //new target
+        this.deactivateAll();
+        this.setActiveObject(target, e);
+      }else if(!target || (target && !target.active) && this.isDoubleClick(newPointer)){
+        // deactivate all
+        this.deactivateAll();
+        this.renderAll();
+        this.fire('deactivate', {e: e });
+      }
+
+      // from itext dblclick
+      this.__lastLastClickTime = this.__lastClickTime;
+      this.__lastClickTime = this.__newClickTime;
+      this.__lastPointer = newPointer;
 
       // we must renderAll so that active image is placed on the top canvas
       shouldRender && this.renderAll();
@@ -403,6 +447,13 @@
       this.fire('mouse:down', { target: target, e: e });
       target && target.fire('mousedown', { e: e });
     },
+
+    isDoubleClick: function(newPointer) {
+      return this.__newClickTime - this.__lastClickTime < 500 &&
+          this.__lastPointer.x === newPointer.x &&
+          this.__lastPointer.y === newPointer.y;
+    },
+
 
     /**
      * @private
@@ -528,6 +579,16 @@
 
       this.fire('mouse:move', { target: target, e: e });
       target && target.fire('mousemove', { e: e });
+
+      // if(!target.entered){
+      //   target.fire('mouseenter', { e: e });
+      //   target.entered = true;
+      // }
+      if(target && target!=this._prevTarget){
+        target.fire('mouseenter', { e: e });
+        this._prevTarget && this._prevTarget.fire('mouseleave', {e:e});
+      }
+      this._prevTarget = target;
     },
 
     /**
