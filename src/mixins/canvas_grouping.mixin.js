@@ -185,6 +185,10 @@
         activeGroup.setObjectsCoords().setCoords();
         activeGroup.isMoving = false;
         this._setCursor(this.defaultCursor);
+
+        if(!this._currentTransform){
+          this.fire('group:select', { group: activeGroup, e: e });
+        }
       }
 
       // clear selection and current transformation

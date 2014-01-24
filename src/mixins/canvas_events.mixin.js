@@ -40,6 +40,9 @@
       addListener(this.upperCanvasEl, 'mousedown', this._onMouseDown);
       addListener(this.upperCanvasEl, 'mousemove', this._onMouseMove);
       addListener(this.upperCanvasEl, 'mousewheel', this._onMouseWheel);
+      // drag events
+      addListener(this.upperCanvasEl, 'dragover', this._onDragOver);
+      addListener(this.upperCanvasEl, 'drop', this._onDrop);
 
       // touch events
       addListener(this.upperCanvasEl, 'touchstart', this._onMouseDown);
@@ -83,6 +86,8 @@
       this._onShake = this._onShake.bind(this);
       this._onOrientationChange = this._onOrientationChange.bind(this);
       this._onMouseWheel = this._onMouseWheel.bind(this);
+      this._onDragOver = this._onDragOver.bind(this);
+      this._onDrop = this._onDrop.bind(this);
     },
 
     /**
@@ -192,6 +197,21 @@
     _onMouseMove: function (e) {
       !this.allowTouchScrolling && e.preventDefault && e.preventDefault();
       this.__onMouseMove(e);
+    },
+
+    /**
+     * @private
+     * @param {Event} e Event object fired on dragover
+     */
+    _onDragOver: function(e){
+      this.__onDragOver(e);
+    },
+    /**
+     * @private
+     * @param {Event} e Event object fired on dragover
+     */
+    _onDrop: function(e){
+      this.__onDrop(e);
     },
 
     /**
@@ -404,6 +424,15 @@
 
       var shouldRender = this._shouldRender(target, pointer),
           shouldGroup = this._shouldGroup(e, target);
+      
+      if((!target || !target.active) && !this._activeObject && !this._activeGroup){ 
+        this._groupSelector = {
+            ex: pointer.x,
+            ey: pointer.y,
+            top: 0,
+            left: 0
+          };
+      }
 
       if (this._shouldClearSelection(e, target)) {
         this._clearSelection(e, target, pointer);
@@ -421,7 +450,6 @@
         this._beforeTransform(e, target);
         this._setupCurrentTransform(e, target);
 
-
       }
       else if (target && target.selectable && !shouldGroup && this.isDoubleClick(newPointer) && !this._activeObject && !this._activeGroup) {
         // this._beforeTransform(e, target);
@@ -429,7 +457,8 @@
         //new target
         this.deactivateAll();
         this.setActiveObject(target, e);
-      }else if(!target || (target && !target.active) && this.isDoubleClick(newPointer)){
+      // }else if(!target || (target && !target.active) && this.isDoubleClick(newPointer)){
+      }else if(!target || (target && !target.active)){
         // deactivate all
         this.deactivateAll();
         this.renderAll();
@@ -588,7 +617,34 @@
         target.fire('mouseenter', { e: e });
         this._prevTarget && this._prevTarget.fire('mouseleave', {e:e});
       }
+      if(!target){
+        this._prevTarget && this._prevTarget.fire('mouseleave', {e:e});
+      }
       this._prevTarget = target;
+    },
+
+    __onDragOver: function(e){
+      var target, pointer;
+      target = this.findTarget(e);
+
+      if(target){
+        target.fire('dragover',e);
+      }
+
+      if(target && this._prevTarget && target!=this._prevTarget){
+        target.fire('dragenter', e);
+        this._prevTarget && this._prevTarget.fire('dragleave', e);
+      }
+      this._prevTarget = target;
+
+    },
+    __onDrop: function(e){
+      var target, pointer;
+      target = this.findTarget(e);
+      if(target){
+        target.fire('drop', e);
+      }
+
     },
 
     /**

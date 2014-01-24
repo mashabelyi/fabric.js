@@ -314,22 +314,28 @@
       var activeGroup = this.getActiveGroup(),
           activeObject = this.getActiveObject();
 
-      return (
-        !target
+      return 
+        (!target
         ||
-        (target &&
-          activeGroup &&
-          !activeGroup.contains(target) &&
-          activeGroup !== target &&
-          !e.shiftKey)
-        ||
-        (target && !target.evented)
-        ||
-        (target &&
-          !target.selectable &&
-          activeObject &&
-          activeObject !== target)
-      );
+        (!activeGroup && !activeObject)
+        );
+        
+      // return (
+      //   !target
+      //   ||
+      //   (target &&
+      //     activeGroup &&
+      //     !activeGroup.contains(target) &&
+      //     activeGroup !== target &&
+      //     !e.shiftKey)
+      //   ||
+      //   (target && !target.evented)
+      //   ||
+      //   (target &&
+      //     !target.selectable &&
+      //     activeObject &&
+      //     activeObject !== target)
+      // );
     },
 
     /**
