@@ -989,7 +989,8 @@
     setActiveGroup: function (group, e) {
       this._setActiveGroup(group);
       if (group) {
-        this.fire('object:selected', { target: group, e: e });
+        // this.fire('object:selected', { target: group, e: e });
+        this.fire('group:select', { group: group, e: e });
         group.fire('selected', { e: e });
       }
       return this;

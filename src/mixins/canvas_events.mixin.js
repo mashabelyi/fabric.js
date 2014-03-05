@@ -406,7 +406,16 @@
 
       // accept only left clicks
       var isLeftClick  = 'which' in e ? e.which === 1 : e.button === 1;
-      if (!isLeftClick && !fabric.isTouchSupported) return;
+      var isRightClick  = 'which' in e ? e.which === 3 : e.button === 2;
+      // if (!isLeftClick && !fabric.isTouchSupported){
+      //   e.stopPropagation(); e.preventDefault();
+      //   var target = this.findTarget(e);
+      //   if(target && isRightClick){
+      //     target.fire('rightclick', { e: e });
+      //   }else{
+      //     return;
+      //   }
+      // }
 
       if (this.isDrawingMode) {
         this._onMouseDownInDrawingMode(e);
@@ -418,6 +427,11 @@
 
       var target = this.findTarget(e),
           pointer = this.getPointer(e);
+
+      if(target && isRightClick && (!this._activeObject || target==this._activeObject)){
+        target.fire('rightclick', { e: e });
+        return;
+      }
 
       // save pointer for check in __onMouseUp event
       this._previousPointer = pointer;
@@ -450,8 +464,7 @@
         this._beforeTransform(e, target);
         this._setupCurrentTransform(e, target);
 
-      }
-      else if (target && target.selectable && !shouldGroup && this.isDoubleClick(newPointer) && !this._activeObject && !this._activeGroup) {
+      }else if (target && target.selectable && !shouldGroup && !this._activeObject && !this._activeGroup) {
         // this._beforeTransform(e, target);
         // this._setupCurrentTransform(e, target);
         //new target
