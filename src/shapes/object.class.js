@@ -31,6 +31,26 @@
     'transform':        'transformMatrix'
   };
 
+  var stylesMap = {
+    'Thin':                 {'fontWeight':100, 'fontStyle':'normal'},
+    'Thin Italic':          {'fontWeight':100, 'fontStyle':'italic'},
+    'Extra-Light':          {'fontWeight':200, 'fontStyle':'normal'},
+    'Extra-Light Italic':   {'fontWeight':200, 'fontStyle':'italic'},
+    'Light':                {'fontWeight':300, 'fontStyle':'normal'},
+    'Light Italic':         {'fontWeight':300, 'fontStyle':'italic'},
+    'Regular':              {'fontWeight':400, 'fontStyle':'normal'},
+    'Regular Italic':       {'fontWeight':400, 'fontStyle':'italic'},
+    'Italic':               {'fontWeight':400, 'fontStyle':'italic'},
+    'Medium':               {'fontWeight':500, 'fontStyle':'normal'},
+    'Medium Italic':        {'fontWeight':500, 'fontStyle':'italic'},  
+    'Semibold':             {'fontWeight':600, 'fontStyle':'normal'},
+    'Semibold Italic':      {'fontWeight':600, 'fontStyle':'italic'},
+    'Bold':                 {'fontWeight':700, 'fontStyle':'normal'},
+    'Bold Italic':          {'fontWeight':700, 'fontStyle':'italic'},
+    'Extrabold':            {'fontWeight':800, 'fontStyle':'normal'},
+    'Extrabold Italic':     {'fontWeight':800, 'fontStyle':'italic'}
+  }
+
   function normalizeAttr(attr) {
     // transform attribute names
     if (attr in attributesMap) {
@@ -874,6 +894,9 @@
      * @return {Any} value of a property
      */
     get: function(property) {
+      if(property=='styleString' && !this.styleString){
+
+      }
       return this[normalizeAttr(property)];
     },
 
@@ -929,6 +952,10 @@
       }
       else if(key == 'transformMatrix'){
         value = new Matrix(value[0], value[1], value[2], value[3], value[4], value[5]);
+      }
+      else if(key == 'styleString'){
+        this._set('fontStyle', stylesMap[value].fontStyle);
+        this._set('fontWeight', stylesMap[value].fontWeight);
       }
 
       this[key] = value;
