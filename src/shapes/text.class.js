@@ -328,7 +328,7 @@
       * @param {Number} maxW Box width
       * @param {Number} maxH Box height
     */
-    wrapCanvasText: function(ctx, maxW, maxH) {
+    wrapCanvasText: function(ctx, maxW, maxH, overflowstr) {
         var t = this;
 
         if (typeof maxH === "undefined") { maxH = 0; }
@@ -393,7 +393,8 @@
             }
             if(maxHAdjusted > 0 && (breakLineCount * lineHeight) > maxHAdjusted) {
                 // add ... at the end indicating text was cutoff
-                formatted = formatted.substr(0, formatted.length - 3) + "...\n";
+                // formatted = formatted.substr(0, formatted.length - 3) + "...\n";
+                formatted = formatted.substr(0, formatted.length - overflowstr.length) + overflowstr+"\n";
                 break;
             }
         }
