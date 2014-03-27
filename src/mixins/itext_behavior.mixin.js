@@ -23,7 +23,7 @@
         var _this = this;
         setTimeout(function() {
           _this.selected = true;
-        }, 100);
+        }, 500); // increase timeout to 500. Short click = just select text el. Longer click - enter editing mode
 
         if (!this._hasCanvasHandlers) {
           this._initCanvasHandlers();
@@ -338,6 +338,7 @@
 
       this.borderColor = this.editingBorderColor;
 
+      this.wasselectable = this.selectable;
       this.hasControls = this.selectable = false;
       this.lockMovementX = this.lockMovementY = true;
     },
@@ -395,7 +396,10 @@
 
       this.selected = false;
       this.isEditing = false;
-      this.selectable = true;
+      // this.selectable = true;
+      if(this.wasselectable!=undefined){
+        this.selectable = this.wasselectable;
+      }
 
       this.selectionEnd = this.selectionStart;
       this.hiddenTextarea && this.hiddenTextarea.blur();

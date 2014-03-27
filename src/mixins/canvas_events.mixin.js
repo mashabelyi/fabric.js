@@ -400,22 +400,9 @@
      */
     __onMouseDown: function (e) {
 
-      // from itext dblclick
-      this.__newClickTime = +new Date();
-      var newPointer = this.getPointer(e);
-
-      // accept only left clicks
+      // left/right click
       var isLeftClick  = 'which' in e ? e.which === 1 : e.button === 1;
       var isRightClick  = 'which' in e ? e.which === 3 : e.button === 2;
-      // if (!isLeftClick && !fabric.isTouchSupported){
-      //   e.stopPropagation(); e.preventDefault();
-      //   var target = this.findTarget(e);
-      //   if(target && isRightClick){
-      //     target.fire('rightclick', { e: e });
-      //   }else{
-      //     return;
-      //   }
-      // }
 
       if (this.isDrawingMode) {
         this._onMouseDownInDrawingMode(e);
@@ -439,7 +426,8 @@
       var shouldRender = this._shouldRender(target, pointer),
           shouldGroup = this._shouldGroup(e, target);
       
-      if((!target || !target.active) && !this._activeObject && !this._activeGroup){ 
+      // allow to drag-select only if clicked outside of any clickable objects
+      if((!target || !target.selectable) && !this._activeObject && !this._activeGroup){ 
         this._groupSelector = {
             ex: pointer.x,
             ey: pointer.y,
@@ -456,21 +444,14 @@
         target = this.getActiveGroup();
       }
 
-      if(target && target.active && this.isDoubleClick(newPointer)){
-        target.fire('dblclickObj', { e: e });
-      }
-
-      if(target && target.active){
+      if (target && target.selectable && !shouldGroup){// && !this._activeObject && !this._activeGroup) {
         this._beforeTransform(e, target);
         this._setupCurrentTransform(e, target);
-
-      }else if (target && target.selectable && !shouldGroup && !this._activeObject && !this._activeGroup) {
-        // this._beforeTransform(e, target);
-        // this._setupCurrentTransform(e, target);
-        //new target
-        this.deactivateAll();
-        this.setActiveObject(target, e);
-      // }else if(!target || (target && !target.active) && this.isDoubleClick(newPointer)){
+        
+        if(!this._activeObject && !this._activeGroup) {
+          this.deactivateAll();
+          this.setActiveObject(target, e);
+        }
       }else if(!target || (target && !target.active)){
         // deactivate all
         this.deactivateAll();
@@ -478,16 +459,12 @@
         this.fire('deactivate', {e: e });
       }
 
-      // from itext dblclick
-      this.__lastLastClickTime = this.__lastClickTime;
-      this.__lastClickTime = this.__newClickTime;
-      this.__lastPointer = newPointer;
-
       // we must renderAll so that active image is placed on the top canvas
       shouldRender && this.renderAll();
 
       this.fire('mouse:down', { target: target, e: e });
       target && target.fire('mousedown', { e: e });
+      
     },
 
     isDoubleClick: function(newPointer) {

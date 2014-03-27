@@ -954,6 +954,7 @@
         value = new Matrix(value[0], value[1], value[2], value[3], value[4], value[5]);
       }
       else if(key == 'styleString'){
+        stylesMap[value] || (value='Regular');
         this._set('fontStyle', stylesMap[value].fontStyle);
         this._set('fontWeight', stylesMap[value].fontWeight);
       }
