@@ -444,7 +444,13 @@
         target = this.getActiveGroup();
       }
 
-      if (target && target.selectable && !shouldGroup){// && !this._activeObject && !this._activeGroup) {
+      if(!target || (target && !target.active && (this._activeObject || this._activeGroup)) ){
+        // deactivate all
+        this.deactivateAll();
+        this.renderAll();
+        this.fire('deactivate', {e: e });
+      }
+      else if (target && target.selectable && !shouldGroup){// && !this._activeObject && !this._activeGroup) {
         this._beforeTransform(e, target);
         this._setupCurrentTransform(e, target);
         
@@ -452,19 +458,20 @@
           this.deactivateAll();
           this.setActiveObject(target, e);
         }
-      }else if(!target || (target && !target.active)){
-        // deactivate all
-        this.deactivateAll();
-        this.renderAll();
-        this.fire('deactivate', {e: e });
       }
+      // else if(!target || (target && !target.active)){
+      //   // deactivate all
+      //   this.deactivateAll();
+      //   this.renderAll();
+      //   this.fire('deactivate', {e: e });
+      // }
 
       // we must renderAll so that active image is placed on the top canvas
       shouldRender && this.renderAll();
 
       this.fire('mouse:down', { target: target, e: e });
       target && target.fire('mousedown', { e: e });
-      
+
     },
 
     isDoubleClick: function(newPointer) {
