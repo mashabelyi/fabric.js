@@ -957,6 +957,11 @@
         stylesMap[value] || (value='Regular');
         this._set('fontStyle', stylesMap[value].fontStyle);
         this._set('fontWeight', stylesMap[value].fontWeight);
+      }else if(key=='fill' && typeof value=='object'){
+        var c = new fabric.Color('rgb('+value.join(",")+')');
+        value = '#'+c.toHex();
+      }else if(key=="text"){
+        value = value ? unescape(value.replace(/%0D/g, '\n')) : '';
       }
 
       this[key] = value;
